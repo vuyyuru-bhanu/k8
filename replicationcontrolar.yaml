@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rcnginx
+spec:
+  minReadySeconds: 3
+  replicas: 4
+  selector: 
+    app: nginx
+  template: 
+    metadata:
+      name: nginx-pod
+      labels:
+        app: nginx
+        ver: "1.23"
+    spec:
+      containers:
+        - name: nginxcon
+          image: nginx:1.23
+          ports: 
+            - containerPort: 80
+              protocol: TCP

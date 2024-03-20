@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-test
+  labels:
+    app: jenkins
+spec:
+  minReadySeconds: 5
+  replicas: 4
+  selector: 
+    matchLabels:
+      app: jenkins
+  strategy:
+    rollingUpdate:
+      maxSurge: 30%
+      maxUnavailable: 25%
+  template: 
+    metadata:
+      name: jenkins-lts
+      labels:
+        app: jenkins
+        ver: "1.23"
+    spec:
+      containers:
+        - name : jenkins
+          image: jenkins:2.60.3    
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy-lb
+  labels:
+    app: jenkins
+    ver: "1.23"
+spec:   
+  type: LoadBalancer
+  selector: 
+    app: jenkins  
+  ports: 
+    - name: lb-port
+      protocol: TCP
+      port: 35000
+      targetPort: 8080        

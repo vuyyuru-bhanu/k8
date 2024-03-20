@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind:  CronJob
+metadata: 
+  namespace: cron
+  name: cronjob-test
+spec:
+  schedule: "0 23 * * *"
+  jobTemplate:
+    metadata:
+      name: cron-temp
+    spec: 
+      backoffLimit: 3
+      selector:
+        matchLabels:
+          job: cron
+      template:
+        metadata:
+          name: cron-pod
+          labels:
+              job: cron
+        spec:
+           containers:
+            - name: alpine
+              image: alpine
+              command:
+                - wget
+                - https://referenceapplicationskhaja.s3.us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
+  
